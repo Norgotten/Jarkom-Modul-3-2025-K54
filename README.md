@@ -215,7 +215,7 @@ iface eth0 inet static
 ## Soal 2
 - **Aldarion**
 
-Lakukan instalasi `server dhcp` terlebih dahulu.
+Lakukan instalasi server DHCP terlebih dahulu.
 ```
 apt-get update && apt-get install isc-dhcp-server -y
 ```
@@ -223,7 +223,7 @@ Buka `/etc/default/isc-dhcp-server` lalu tambahkan `eth0` pada `INTERFACESv4`.
 ```
 INTERFACESv4="eth0"
 ```
-Buat konfigurasi `dhcp`.
+Buat konfigurasi DHCP.
 ```
 cat > /etc/dhcp/dhcpd.conf << EOF
 authoritative;
@@ -268,14 +268,14 @@ subnet 192.238.4.0 netmask 255.255.255.0 {
 }
 EOF
 ```
-Mulai `server dhcp`.
+Mulai server DHCP.
 ```
 service isc-dhcp-server start
 ```
 
 - **Durin**
 
-Lakukan instalasi `relay dhcp`.
+Lakukan instalasi relay DHCP.
 ```
 apt-get update && apt-get install isc-dhcp-relay -y
 ```
@@ -397,22 +397,19 @@ Lalu edit zona konfigurasi DNS seperti berikut:
 cat > /etc/bind/k54/k54.com << 'EOF'
 $TTL 604800
 @       IN SOA  ns1.k54.com. root.k54.com. (
-                        2025103001      ; Serial
-                        604800          ; Refresh
-                        86400           ; Retry
-                        2419200         ; Expire
-                        604800 )        ; Negative Cache TTL
+                        2025103001
+                        604800
+                        86400
+                        2419200
+                        604800 )
 
-; Name Servers
         IN NS   ns1.k54.com.
         IN NS   ns2.k54.com.
 
-; A Records
 @       IN A    192.238.3.3
 ns1     IN A    192.238.3.3
 ns2     IN A    192.238.3.4
 
-; Node Records
 palantir        IN A    192.238.4.3
 elros           IN A    192.238.1.7
 pharazon        IN A    192.238.2.4
@@ -423,20 +420,19 @@ galadriel       IN A    192.238.2.5
 celeborn        IN A    192.238.2.6
 oropher         IN A    192.238.2.7
 
-; CNAME
 www     IN CNAME        k54.com.
 EOF
-
-nano /etc/bind/k54/192.238.3.rev
-
+```
+Lalu buat reverse zone nya seperti berikut:
+```
 cat > /etc/bind/k54/192.238.3.rev << 'EOF'
 $TTL 604800
 @       IN SOA  ns1.k54.com. root.k54.com. (
-                        2025103001      ; Serial
-                        604800          ; Refresh
-                        86400           ; Retry
-                        2419200         ; Expire
-                        604800 )        ; Negative Cache TTL
+                        2025103001
+                        604800
+                        86400
+                        2419200
+                        604800 )
 
 ; Name Servers
         IN NS   ns1.k54.com.
@@ -522,3 +518,103 @@ Mulai ulang server.
 ```
 service bind9 restart
 ```
+
+- **DHCP Client (Amandil & Gilgalad)
+
+Lakukan instalasi client DHCP.
+```
+apt-get update && apt-get install isc-dhcp-client -y
+```
+Minta IP baru dari server DHCP.
+```
+dhclient -r
+dhclient eth0
+```
+Lakukan pengetesan seperti berikut:
+```
+nslookup k54.com
+nslookup palantir.k54.com
+nslookup ns1.k54.com
+```
+
+- **Amdir**
+
+Cek zona transfer dari master ke slave DNS seperti berikut:
+```
+ls -la /var/cache/bind/
+```
+Lalu lakukan pengecekan seperti berikut:
+```
+nslookup k54.com 127.0.0.1
+nslookup ns1.k54.com 127.0.0.1
+nslookup palantir.k54.com 127.0.0.1
+```
+
+## Soal 5
+- **Erendis**
+
+Edit untuk menammbahkan pesan rahasia seperti berikut:
+```
+@               IN TXT  "Cincin Sauron menuju Elros"
+@               IN TXT  "Aliansi Terakhir menuju Pharazon"
+elros           IN TXT  "Cincin Sauron"
+pharazon        IN TXT  "Aliansi Terakhir"
+```
+Mulai ulang service `bind9`.
+```
+service bind9 restart
+```
+Lakukan pengetesan seperti berikut:
+```
+nslookup www.k54.com 127.0.0.1
+nslookup 192.238.3.3 127.0.0.1
+nslookup 192.238.3.4 127.0.0.1
+nslookup -type=TXT k54.com 127.0.0.1
+nslookup -type=TXT elros.k54.com 127.0.0.1
+nslookup -type=TXT pharazon.k54.com 127.0.0.1
+```
+
+- **Amdir**
+
+Lakukan pengetesan yang sama pada slave.
+```
+nslookup www.k54.com 127.0.0.1
+nslookup 192.238.3.3 127.0.0.1
+nslookup 192.238.3.4 127.0.0.1
+nslookup -type=TXT k54.com 127.0.0.1
+nslookup -type=TXT elros.k54.com 127.0.0.1
+nslookup -type=TXT pharazon.k54.com 127.0.0.1
+```
+
+## Soal 6
+- **Aldarion**
+
+Ganti `lease-time` sesuai soal tiap subnet.
+```
+# Subnet 1
+default-lease-time 1800;    # 30 MENIT
+max-lease-time 3600;        # 1 JAM
+
+# Subnet 2
+default-lease-time 600;     # 10 MENIT
+max-lease-time 3600;        # 1 JAM
+
+# Subnet 3
+default-lease-time 1800;    # 30 MENIT  
+max-lease-time 3600;        # 1 JAM
+```
+Mulai ulang `server dhcp`.
+```
+service isc-dhcp-server restart
+```
+
+- **Client DHCP (Amandil & Gilgalad)**
+
+Tes dengan minta IP pada server DHCP.
+```
+dhclient -r
+dhclient -v eth0
+```
+
+## Soal 7
+
