@@ -618,3 +618,195 @@ dhclient -v eth0
 
 ## Soal 7
 
+- **Worker Laravel (Elendil, Isildur, Anarion)
+
+Lakukan instalasi yang diperlukan.
+```
+apt-get update && apt-get install -y nginx php8.4 php8.4-fpm php8.4-mysql php8.4-mbstring php8.4-xml php8.4-curl php8.4-zip git unzip htop
+```
+Lalu setup composer untuk manage PHP packages di projek Laravel.
+```
+curl -sS https://getcomposer.org/installer -o composer-setup.php
+php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+chmod +x /usr/local/bin/composer
+```
+Lalu buka `/etc/nginx/sites-available/laravel` untuk mengedit konfigurasi nginx aplikasi Laravel, ganti `<worker>` sesuai dengan nama worker.
+```
+server {
+    listen 80;
+    server_name elendil.k54.com;
+    root /var/www/laravel/public;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.4-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+```
+Lanjut nyalakan situs `nginx` dan hapus tampilan default-nya.
+```
+ln -s /etc/nginx/sites-available/laravel /etc/nginx/sites-enabled/
+rm /etc/nginx/sites-enabled/default
+```
+Mulai ulang `nginx` dan `php`.
+```
+service nginx restart
+service php8.4-fpm restart
+```
+Lanjut download dan setup projek Laravel.
+```
+mkdir -p /var/www
+cd /var/www
+git clone https://github.com/elshiraphine/laravel-simple-rest-api.git laravel
+cd laravel
+composer install --no-dev --optimize-autoloader
+```
+Lanjut setup environment dan security key untuk Laravel, serta set permissions.
+```
+cp .env.example .env
+php artisan key:generate
+chown -R www-data:www-data /var/www/laravel
+chmod -R 755 /var/www/laravel/storage
+chmod -R 755 /var/www/laravel/bootstrap/cache
+```
+Lalu edit konfigurasi environment Laravel dengan `nano .env`. Edit database dan application seperti berikut:
+```
+DB_CONNECTION=mysql
+DB_HOST=192.238.4.3
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=k54
+DB_PASSWORD=mclaren
+
+APP_URL=http://<worker>.k54.com
+APP_ENV=production
+APP_DEBUG=false
+```
+Mulai ulang `nginx` dan `php`.
+```
+service nginx restart
+service php8.4-fpm restart
+```
+Lakukan pengetesan seperti berikut:
+```
+curl -I http://localhost
+curl http://localhost
+```
+
+- **Client Statis (Miriel & Celebrimbor)**
+
+Lakukan pengetesan pada klien statis seperti berikut:
+```
+apt-get update && apt-get install lynx -y
+lynx http://elendil.k54.com
+curl http://elendil.k54.com
+curl -I http://elendil.k54.com
+ping elendil.k54.com -c 5
+```
+
+## Soal 8
+
+- **Palantir**
+
+Install dan jalankan `mariadb`.
+```
+apt-get update && apt-get install mariadb-server -y
+service mariadb start
+service mariadb enable
+```
+Lalu setup database dan user di `mariadb`.
+```
+mysql -u root -e "CREATE DATABASE laravel;"
+mysql -u root -e "CREATE USER 'k54'@'%' IDENTIFIED BY 'mclaren';"
+mysql -u root -e "GRANT ALL PRIVILEGES ON laravel.* TO 'k54'@'%';"
+mysql -u root -e "FLUSH PRIVILEGES;"
+```
+Lalu buka firewall database agar bisa diakses dari server lain dengan `nano /etc/mysql/mariadb.conf.d/50-server.cnf`.
+```
+# bind-address = 127.0.0.1       > di comment aja
+```
+Mulai ulang `mariadb.`
+```
+service mariadb restart
+```
+Lakukan pengetesan seperti berikut:
+```
+mysql -u root -e "SELECT user, host FROM mysql.user WHERE user = 'k54';"
+mysql -u root -e "SHOW GRANTS FOR 'k54'@'%';"
+mysql -u root -e "SHOW DATABASES;"
+```
+
+- **Worker Laravel (Elendil, Isildur, Anarion)**
+
+Ganti konfigurasi keamanan tiap worker seperti berikut:
+Elendil: 
+```
+listen 8001;
+server_name elendil.k54.com;
+if ($host !~* ^(elendil\.k54\.com)$ ) { return 444; }
+```
+Isildur:
+```
+listen 8002;
+server_name isildur.k54.com;
+if ($host !~* ^(isildur\.k54\.com)$ ) { return 444; }
+```
+Anarion:
+```
+listen 8003; 
+server_name anarion.k54.com;
+if ($host !~* ^(anarion\.k54\.com)$ ) { return 444; }
+```
+Mulai ulang `nginx`.
+```
+service nginx restart
+```
+
+- **Elendil**
+
+Lakukan instalasi pada `mariadb` dan jalankan migrasi.
+```
+apt-get install -y mariadb-client
+mysql -h 192.238.4.3 -u k54 -p laravel
+# exit aja
+
+php artisan migrate
+
+php artisan tinker
+>>> DB::connection()->getPdo();
+>>> exit;
+```
+
+## Soal 9
+
+- **Client Statis (Miriel & Celebrimbor)
+
+Lakukan instalasi `lynx` terlebih dahulu.
+```
+apt-get update && apt-get install lynx -y
+```
+Lakukan pengetesan seperti berikut:
+```
+lynx http://elendil.k54.com:8001
+lynx http://isildur.k54.com:8002  
+lynx http://anarion.k54.com:8003
+
+curl http://elendil.k54.com:8001/api/airing
+curl http://isildur.k54.com:8002/api/airing
+curl http://anarion.k54.com:8003/api/airing
+```
+
+## Soal 10
+
+- **
