@@ -519,7 +519,7 @@ Mulai ulang server.
 service bind9 restart
 ```
 
-- **DHCP Client (Amandil & Gilgalad)
+- **DHCP Client (Amandil & Gilgalad)**
 
 Lakukan instalasi client DHCP.
 ```
@@ -618,7 +618,7 @@ dhclient -v eth0
 
 ## Soal 7
 
-- **Worker Laravel (Elendil, Isildur, Anarion)
+- **Worker Laravel (Elendil, Isildur, Anarion)**
 
 Lakukan instalasi yang diperlukan.
 ```
@@ -790,7 +790,7 @@ php artisan tinker
 
 ## Soal 9
 
-- **Client Statis (Miriel & Celebrimbor)
+- **Client Statis (Miriel & Celebrimbor)**
 
 Lakukan instalasi `lynx` terlebih dahulu.
 ```
@@ -809,4 +809,330 @@ curl http://anarion.k54.com:8003/api/airing
 
 ## Soal 10
 
-- **
+- **Elros**
+
+Lakukan instalasi `nginx` terlebih dahulu.
+```
+apt-get update && apt-get install -y nginx
+```
+Lalu buka `/etc/nginx/sites-available/reverse-proxy` untuk membuat konfigurasi reverse proxy dengan `nginx`.
+```
+upstream kesatria_numenor {
+    server elendil.k54.com:8001;
+    server isildur.k54.com:8002;
+    server anarion.k54.com:8003;
+}
+
+server {
+    listen 80;
+    server_name elros.k54.com;
+
+    location / {
+        proxy_pass http://kesatria_numenor;
+        proxy_set_header Host elros.k54.com;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+Lanjut aktifkan `nginx` lalu hapus defaultnya, setelah itu dapat langsung menjalankan `nginx`.
+```
+ln -s /etc/nginx/sites-available/reverse-proxy /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+service nginx restart
+```
+
+- **Worker Laravel (Elendil, Isildur, Anarion)**
+
+Ketik tiap command berikut sesuai terminal masing-masing.
+```
+if ($host !~* ^(elendil\.k54\.com|elros\.k54\.com)$ ) { return 444; }
+if ($host !~* ^(isildur\.k54\.com|elros\.k54\.com)$ ) { return 444; }
+if ($host !~* ^(anarion\.k54\.com|elros\.k54\.com)$ ) { return 444; }
+```
+Lanjut jalankan migrasi di semua terminal worker laravel.
+```
+php artisan migrate
+```
+Buka akses log.
+```
+tail -f /var/log/nginx/access.log
+```
+
+- **Client (Miriel & Celebrimbor)**
+
+Lakukan pengetesan dengan perintah seperti berikut:
+```
+lynx http://elros.k54.com
+curl http://elros.k54.com/api/airing
+```
+
+## Soal 11
+
+- **Worker Laravel (Elendil, Isildur, Anarion)**
+
+buka `/etc/php/8.4/fpm/pool.d/www.conf` lalu edit seperti berikut untuk meningkatkan kapasitas `PHP-FPM` sesuai permintaan soal.
+```
+pm.max_children = 50           # dari default 5
+pm.start_servers = 10          # dari default 2  
+pm.min_spare_servers = 5       # dari default 1
+pm.max_spare_servers = 20      # dari default 3
+```
+Lanjut mulai ulang `php`.
+```
+service php8.4-fpm restart
+```
+Lanjut buat cache.
+```
+php artisan config:cache
+php artisan route:cache
+```
+Lanjut bikin daftar lokasi file class biar lebih cepat di-load.
+```
+composer dump-autoload --optimize
+```
+
+- **Palantir**
+
+Buka `/etc/mysql/mariadb.conf.d/50-server.cnf` lalu edit seperti berikut:
+```
+[mysqld]
+max_connections = 500          # dari default 151
+```
+Lalu mulai ulang `mariadb`.
+```
+service mariadb restart
+```
+
+- **Elros**
+
+Lalu buka log dengan perintah berikut:
+```
+tail -f /var/log/nginx/access.log
+```
+
+## Soal 12
+
+- **Worker PHP (Galadriel, Celeborn, Oropher)**
+
+Lakukan instalasi `nginx` dan `php`, lalu mulai service.
+```
+apt-get update && apt-get install -y nginx php8.4-fpm
+service nginx start
+service php8.4-fpm start
+```
+Buat direktori `mkdir -p /var/www/html`, lalu buat `index.php` seperti berikut:
+```
+cat > /var/www/html/index.php << 'EOF'
+<?php
+$hostname = gethostname();
+echo "<h1>Sirkuit Pribadi  $hostname</h1>";
+echo "<p>P balap, arena pribadi $hostname</p>";
+echo "<p>Server: " . $_SERVER['SERVER_NAME'] . "</p>";
+?>
+EOF
+```
+Lanjut buat konfigurasi virtual host seperti berikut dengan mengganti <worker> sesuai terminal worker yang dijalankan:
+```
+cat >  /etc/nginx/sites-available/sirkuit << 'EOF'
+server {
+    listen 80;
+    server_name <worker>.k54.com;
+    
+    if ($host !~* ^(<worker>\.k54\.com)$ ) {
+        return 444;
+    }
+    
+    root /var/www/html;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.4-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}
+EOF
+```
+Lanjut aktifkan situs `nginx` dan hapus default, lalu jalankan `nginx` dan `php`.
+```
+ln -s /etc/nginx/sites-available/sirkuit /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+service nginx restart && service php8.4-fpm restart
+```
+Lalu beri hak akses seperti berikut:
+```
+chown -R www-data:www-data /var/www/html
+chmod -R 755 /var/www/html
+```
+Lakukan pengetesan seperti berikut:
+```
+curl http://celeborn.k54.com
+nslookup celeborn.k54.com
+```
+
+- **Client Statis (Miriel & Celebrimbor)**
+
+Lakukan pengetesan seperti berikut:
+```
+lynx http://galadriel.k54.com
+lynx http://celeborn.k54.com  
+lynx http://oropher.k54.com
+
+curl http://galadriel.k54.com
+curl http://celeborn.k54.com
+curl http://oropher.k54.com
+```
+
+## Soal 13
+
+- **Worker PHP (Galadriel, Celeborn, Oropher)**
+
+Buka `/etc/nginx/sites-available/sirkuit` dan ganti port sesuai ketentuan soal seperti berikut:
+```
+# Galadriel 8004
+server {
+    listen 8004;
+
+# Celeborn 8005
+server {
+    listen 8005;
+
+# Oropher 8006
+server {
+    listen 8006;
+```
+
+- **Client Statis (Miriel & Celebrimbor)**
+
+Lakukan pengetesan seperti berikut:
+```
+curl http://galadriel.k54.com:8004
+curl http://celeborn.k54.com:8005
+curl http://oropher.k54.com:8006
+
+curl http://galadriel.k54.com:8004/index.php
+```
+
+## Soal 14
+
+- **Worker PHP (Galadriel, Celeborn, Oropher)**
+
+Lakukan instalasi `apache`.
+```
+apt-get update && apt-get install -y apache2-utils
+```
+Buat direktori untuk menyimpan password dengan `mkdir -p /etc/nginx/secure`, lalu buat akun dan password dengan berikut:
+```
+htpasswd -bc /etc/nginx/secure/.htpasswd noldor silvan
+```
+Buka `/etc/nginx/sites-available/sirkuit` lalu edit seperti berikut:
+```
+server {
+...
+    root /var/www/html;
+    index index.php index.html;
+
+    auth_basic "Restricted Access";
+    auth_basic_user_file /etc/nginx/secure/.htpasswd;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+...
+        include fastcgi_params;
+        
+        auth_basic "Restricted Access";
+        auth_basic_user_file /etc/nginx/secure/.htpasswd;
+    }
+}
+```
+Mulai ulang service `nginx`.
+```
+service nginx restart
+```
+Buat hak akses yang aman untuk file password.
+```
+chown www-data:www-data /etc/nginx/secure/.htpasswd
+chmod 600 /etc/nginx/secure/.htpasswd
+```
+
+- **Client Statis (Miriel & Celebrimbor)**
+
+Lakukan pengetesan seperti berikut:
+```
+curl -I http://galadriel.k54.com:8004/
+curl -u noldor:silvan http://galadriel.k54.com:8004/
+curl -H "Authorization: Basic $(echo -n 'noldor:silvan' | base64)" http://galadriel.k54.com:8004/
+lynx http://galadriel.k54.com:8004/
+```
+
+## Soal 15
+
+- **Worker PHP (Galadriel, Celeborn, Oropher)**
+
+Buka `/etc/nginx/sites-available/sirkuit` lalu edit seperti berikut:
+```
+server {
+...
+    location / {
+        try_files $uri $uri/ =404;
+        
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ~ \.php$ {
+...
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+
+        fastcgi_param X-Real-IP $remote_addr;
+        fastcgi_param X-Forwarded-For $proxy_add_x_forwarded_for;
+        fastcgi_param X-Forwarded-Proto $scheme;
+...
+    }
+}
+```
+Mulai ulang service `nginx`.
+```
+service nginx restart
+```
+Buka `/var/www/html/index.php` untuk mengedit halaman php seperti berikut:
+```
+<?php
+$hostname = gethostname();
+$visitor_ip = $_SERVER['HTTP_X_REAL_IP'] ??
+              $_SERVER['HTTP_X_FORWARDED_FOR'] ??
+              $_SERVER['REMOTE_ADDR'] ??
+              'Unknown';
+
+echo "<h1>Sirkuit Pribadi $hostname</h1>";
+echo "<p>P balap, arena pribadi $hostname</p>";
+echo "<p>Server: " . $_SERVER['SERVER_NAME'] . "</p>";
+echo "<p>IP Pengunjung: <strong>$visitor_ip</strong></p>";
+echo "<p>Waktu Akses: " . date('Y-m-d H:i:s') . "</p>";
+?>
+```
+Lanjut edit hak akses seperti berikut:
+```
+chown www-data:www-data /var/www/html/index.php
+chmod 644 /var/www/html/index.php
+```
+
+- **Client Statis (Miriel & Celebrimbor)**
+
+Lakukan pengetesan seperti berikut:
+```
+curl -u noldor:silvan http://galadriel.k54.com:8004/
+curl -u noldor:silvan http://celeborn.k54.com:8005/
+curl -u noldor:silvan http://oropher.k54.com:8006/
+```
