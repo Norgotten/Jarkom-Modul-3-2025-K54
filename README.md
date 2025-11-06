@@ -582,6 +582,7 @@ nslookup -type=TXT k54.com 127.0.0.1
 nslookup -type=TXT elros.k54.com 127.0.0.1
 nslookup -type=TXT pharazon.k54.com 127.0.0.1
 ```
+<img width="1356" height="467" alt="image" src="https://github.com/user-attachments/assets/177fa27a-6f34-4643-95f9-beb8660e8043" />
 
 - **Amdir**
 
@@ -594,6 +595,7 @@ nslookup -type=TXT k54.com 127.0.0.1
 nslookup -type=TXT elros.k54.com 127.0.0.1
 nslookup -type=TXT pharazon.k54.com 127.0.0.1
 ```
+<img width="1363" height="633" alt="image" src="https://github.com/user-attachments/assets/4ea534a2-4a55-4966-9247-56512cf85ae6" />
 
 ## Soal 6
 - **Aldarion**
@@ -624,6 +626,8 @@ Tes dengan minta IP pada server DHCP.
 dhclient -r
 dhclient -v eth0
 ```
+<img width="1361" height="381" alt="image" src="https://github.com/user-attachments/assets/5be4432f-e587-48c0-b707-83a797b87368" />
+<img width="1363" height="373" alt="image" src="https://github.com/user-attachments/assets/af6d9cf4-fa32-47cb-8cb1-982c514cf871" />
 
 ## Soal 7
 
@@ -712,6 +716,7 @@ Lakukan pengetesan seperti berikut:
 curl -I http://localhost
 curl http://localhost
 ```
+<img width="1505" height="371" alt="image" src="https://github.com/user-attachments/assets/12f7fb55-5c63-47fb-b3f8-1acf0cbb2ba1" />
 
 - **Client Statis (Miriel & Celebrimbor)**
 
@@ -723,6 +728,8 @@ curl http://elendil.k54.com
 curl -I http://elendil.k54.com
 ping elendil.k54.com -c 5
 ```
+<img width="1501" height="471" alt="image" src="https://github.com/user-attachments/assets/1190dc2b-03e0-4056-b9fc-4f6bbb892cd9" />
+<img width="1495" height="275" alt="image" src="https://github.com/user-attachments/assets/ee898bc0-4058-4424-9e3c-ec202fe5f899" />
 
 ## Soal 8
 
@@ -755,6 +762,7 @@ mysql -u root -e "SELECT user, host FROM mysql.user WHERE user = 'k54';"
 mysql -u root -e "SHOW GRANTS FOR 'k54'@'%';"
 mysql -u root -e "SHOW DATABASES;"
 ```
+<img width="1494" height="590" alt="image" src="https://github.com/user-attachments/assets/6396389e-617d-460e-8ce4-b5683dfca70b" />
 
 - **Worker Laravel (Elendil, Isildur, Anarion)**
 
@@ -815,6 +823,7 @@ curl http://elendil.k54.com:8001/api/airing
 curl http://isildur.k54.com:8002/api/airing
 curl http://anarion.k54.com:8003/api/airing
 ```
+<img width="1382" height="171" alt="image" src="https://github.com/user-attachments/assets/5d101d59-c29a-454a-a7ff-a844dbd54fb4" />
 
 ## Soal 10
 
@@ -876,6 +885,9 @@ Lakukan pengetesan dengan perintah seperti berikut:
 lynx http://elros.k54.com
 curl http://elros.k54.com/api/airing
 ```
+<img width="1493" height="739" alt="image" src="https://github.com/user-attachments/assets/321284b2-5309-45b8-a37b-e3b940c26914" />
+<img width="881" height="109" alt="image" src="https://github.com/user-attachments/assets/ac3cd93b-5288-45ee-946c-19d1465edd12" />
+<img width="1476" height="290" alt="image" src="https://github.com/user-attachments/assets/43a89525-1eef-421d-940f-438364cd18ea" />
 
 ## Soal 11
 
@@ -929,6 +941,10 @@ apt-get update && apt-get install -y apache2-utils
 ab -n 100 -c 10 http://elros.k54.com/api/airing/
 ab -n 2000 -c 100 http://elros.k54.com/api/airing/
 ```
+<img width="1488" height="689" alt="image" src="https://github.com/user-attachments/assets/278f2d12-71e4-4e30-8c91-1d25cac9f6c3" />
+<img width="1483" height="702" alt="image" src="https://github.com/user-attachments/assets/deda41cd-f2d5-4f23-9855-af96d85c99cf" />
+<img width="1492" height="693" alt="image" src="https://github.com/user-attachments/assets/03a587f9-0dd2-464e-a8e5-ac0259a50f8b" />
+<img width="1485" height="691" alt="image" src="https://github.com/user-attachments/assets/a2b7af3f-d9cb-4bd4-80eb-9d85befc30ae" />
 
 ## Soal 12
 
@@ -994,6 +1010,7 @@ Lakukan pengetesan seperti berikut:
 curl http://celeborn.k54.com
 nslookup celeborn.k54.com
 ```
+<img width="1486" height="292" alt="image" src="https://github.com/user-attachments/assets/bf4008c5-139f-49e9-aba8-6181e7a96318" />
 
 - **Client Statis (Miriel & Celebrimbor)**
 
@@ -1007,6 +1024,8 @@ curl http://galadriel.k54.com
 curl http://celeborn.k54.com
 curl http://oropher.k54.com
 ```
+<img width="1503" height="186" alt="image" src="https://github.com/user-attachments/assets/08e97248-1fbb-4caa-857f-c7ab4bcb75b6" />
+<img width="1440" height="178" alt="image" src="https://github.com/user-attachments/assets/e0e82d5c-a39a-44a0-b8f4-9b4bd9f25459" />
 
 ## Soal 13
 
@@ -1037,6 +1056,7 @@ curl http://oropher.k54.com:8006
 
 curl http://galadriel.k54.com:8004/index.php
 ```
+<img width="1493" height="184" alt="image" src="https://github.com/user-attachments/assets/0ec59a9e-ee6a-42e9-88a1-16862be3c99a" />
 
 ## Soal 14
 
@@ -1087,11 +1107,15 @@ chmod 600 /etc/nginx/secure/.htpasswd
 
 Lakukan pengetesan seperti berikut:
 ```
-curl -I http://galadriel.k54.com:8004/
-curl -u noldor:silvan http://galadriel.k54.com:8004/
-curl -H "Authorization: Basic $(echo -n 'noldor:silvan' | base64)" http://galadriel.k54.com:8004/
+ curl -I http://galadriel.k54.com:8004/                                                              # Gagal karena tidak menggunakan user password
+curl -u noldor:silvan http://galadriel.k54.com:8004/                                                 # Berhasil
+curl -H "Authorization: Basic $(echo -n 'noldor:silvan' | base64)" http://galadriel.k54.com:8004/    # Berhasil
 lynx http://galadriel.k54.com:8004/
 ```
+<img width="1494" height="278" alt="image" src="https://github.com/user-attachments/assets/4514c9f9-d4da-4f58-b574-0b4fceb04354" />
+<img width="997" height="123" alt="image" src="https://github.com/user-attachments/assets/0c884000-7056-412f-aa76-54b140aca1b2" />
+<img width="950" height="108" alt="image" src="https://github.com/user-attachments/assets/a8f1fd08-2734-4465-9dad-064d565e2c8f" />
+<img width="1443" height="178" alt="image" src="https://github.com/user-attachments/assets/f4c0ca11-e3aa-465a-b3c2-44b7b9a57aab" />
 
 ## Soal 15
 
@@ -1154,3 +1178,5 @@ curl -u noldor:silvan http://galadriel.k54.com:8004/
 curl -u noldor:silvan http://celeborn.k54.com:8005/
 curl -u noldor:silvan http://oropher.k54.com:8006/
 ```
+<img width="1488" height="184" alt="image" src="https://github.com/user-attachments/assets/17b5e82d-65a4-43d3-a25c-ca4f40391249" />
+<img width="1493" height="184" alt="image" src="https://github.com/user-attachments/assets/76a290e4-cf4d-4383-b4ab-f3900f8d75c7" />
