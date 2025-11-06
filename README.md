@@ -211,6 +211,8 @@ iface eth0 inet static
  	netmask 255.255.255.0
  	gateway 192.238.5.1
 ```
+Berikut adalah contoh pengetesan dengan ping ke `google.com`.
+<img width="1324" height="279" alt="image" src="https://github.com/user-attachments/assets/1976faa9-d059-4466-8871-5850a62c7e92" />
 
 ## Soal 2
 - **Aldarion**
@@ -295,6 +297,7 @@ Lalu mulai `relay dhcp`.
 ```
 service isc-dhcp-relay start
 ```
+<img width="1323" height="140" alt="image" src="https://github.com/user-attachments/assets/9fcf9613-9e6f-485b-864c-7f1bcd49ee17" />
 
 ## Soal 3
 - **Minastir**
@@ -343,6 +346,8 @@ nslookup google.com
 nslookup k54.com
 nslookup www.k54.com
 ```
+<img width="1347" height="579" alt="image" src="https://github.com/user-attachments/assets/4a44ed70-ecf1-46e2-acdd-9a6b18918a53" />
+<img width="1346" height="437" alt="image" src="https://github.com/user-attachments/assets/5243736e-bfe7-4cc8-9605-d6d82184e824" />
 
 ## Soal 4
 - **Erendis**
@@ -536,6 +541,7 @@ nslookup k54.com
 nslookup palantir.k54.com
 nslookup ns1.k54.com
 ```
+<img width="1354" height="583" alt="image" src="https://github.com/user-attachments/assets/e2e4fe28-7b74-433a-b1f3-46f1237d6347" />
 
 - **Amdir**
 
@@ -543,12 +549,15 @@ Cek zona transfer dari master ke slave DNS seperti berikut:
 ```
 ls -la /var/cache/bind/
 ```
+<img width="1357" height="191" alt="image" src="https://github.com/user-attachments/assets/e693300d-b2aa-4716-97ad-bce8f8076545" />
+
 Lalu lakukan pengecekan seperti berikut:
 ```
 nslookup k54.com 127.0.0.1
 nslookup ns1.k54.com 127.0.0.1
 nslookup palantir.k54.com 127.0.0.1
 ```
+<img width="1356" height="467" alt="image" src="https://github.com/user-attachments/assets/13f6ae98-3674-4a4b-841d-7299c0831c50" />
 
 ## Soal 5
 - **Erendis**
@@ -860,7 +869,7 @@ Buka akses log.
 tail -f /var/log/nginx/access.log
 ```
 
-- **Client (Miriel & Celebrimbor)**
+- **Client Statis (Miriel & Celebrimbor)**
 
 Lakukan pengetesan dengan perintah seperti berikut:
 ```
@@ -910,6 +919,15 @@ service mariadb restart
 Lalu buka log dengan perintah berikut:
 ```
 tail -f /var/log/nginx/access.log
+```
+
+- **Client (Miriel & Celembrimbor)**
+
+Lakukan pengetesan seperti berikut:
+```
+apt-get update && apt-get install -y apache2-utils
+ab -n 100 -c 10 http://elros.k54.com/api/airing/
+ab -n 2000 -c 100 http://elros.k54.com/api/airing/
 ```
 
 ## Soal 12
